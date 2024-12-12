@@ -14,8 +14,7 @@ namespace jobApplicationTrackerApi.Models
         public string JobTitle { get; set; } = string.Empty;
         [Required]
         public int StatusId { get; set; }  //could be [Guid]
-        [Required]
-        public DateTime? ApplicationDate { get; set; }   //currently is not null because of required, but if we are planning to create a canban board if it will be in a so called TODO table it should be null in my opinion
+        public DateTime? ApplicationDate { get; set; }   //class diagram want it to be not null, but if we are planning to create a canban board if it will be in a so called TODO table it should be null in my opinion. 
         public DateTime? InterviewDate { get; set; }
         public string? Notes { get; set; }
         public decimal? Salary { get; set; }
@@ -23,7 +22,6 @@ namespace jobApplicationTrackerApi.Models
         public string? JobDescription { get; set; }
         [Required]
         public int UserId { get; set; }             //could be [Guid]
-
-        public DateTime CreatedAt = DateTime.Now;   //Not sure if it's correct way of doing it
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
