@@ -5,9 +5,9 @@ namespace jobApplicationTrackerApi.Models
     public class JobApplicationHistory
     {
         [Key]
-        public int Id { get; set; }     //could be [Guid]
-        public int JobApplicationId { get; set; }   //could be [Guid]
-        public int StatusId { get; set; }   //could be [Guid]
+        public Guid Id { get; set; }
+        public Guid JobApplicationId { get; set; }
+        public Guid StatusId { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
 }

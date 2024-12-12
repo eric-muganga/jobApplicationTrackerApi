@@ -5,7 +5,7 @@ namespace jobApplicationTrackerApi.Models
     public class Status
     {
         [Key]
-        public int Id { get; set; }     //could be [Guid]
+        public Guid Id { get; set; }
         [Required]
         [MaxLength(50, ErrorMessage = "Status name should not exceed 50 characters")]
         public string Name { get; set; }

@@ -5,7 +5,7 @@ namespace jobApplicationTrackerApi.Models
     public class EmploymentType
     {
         [Key]
-        public int Id { get; set; }     //could be [Guid]
+        public Guid Id { get; set; }
         [Required]
         public string Name { get; set; }
     }
