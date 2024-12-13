@@ -2,11 +2,13 @@
 
 namespace jobApplicationTrackerApi.Models
 {
-    public class EmploymentType
+    public class Status
     {
-        [Key]
         public Guid Id { get; set; }
-        [Required]
         public string Name { get; set; }
+        public int SortOrder { get; set; }
+
+
+        public ICollection<JobApplication> JobApplications { get; set; }
     }
 }
