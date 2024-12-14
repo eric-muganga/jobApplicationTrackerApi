@@ -1,6 +1,6 @@
-﻿namespace jobApplicationTrackerApi.DataModels
+﻿namespace jobApplicationTrackerApi.ViewModels
 {
-    public class FinancialInformation
+    public class FinancialInformationView
     {
         public Guid Id { get; set; }
         public string Salary { get; set; }
