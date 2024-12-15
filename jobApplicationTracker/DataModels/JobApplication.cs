@@ -1,7 +1,6 @@
-﻿using jobApplicationTrackerApi.DataModels;
-using System.ComponentModel.DataAnnotations;
+﻿
 
-namespace jobApplicationTrackerApi.Models
+namespace jobApplicationTrackerApi.DataModels
 {
     public class JobApplication
     {
@@ -14,11 +13,12 @@ namespace jobApplicationTrackerApi.Models
         public string? Notes { get; set; }
         public Guid ContractTypeId { get; set; }
         public string? JobDescription { get; set; }
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
+        public ApplicationUser User { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public Guid FinancialInformationId { get; set; }
-
-
+        
+        
         public Status Status { get; set; }
         public ContractType ContractType { get; set; }
         public FinancialInformation FinancialInformation { get; set; }

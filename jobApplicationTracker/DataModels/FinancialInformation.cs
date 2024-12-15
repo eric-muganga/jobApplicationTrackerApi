@@ -7,5 +7,7 @@
         public string Currency { get; set; }
         public string SalaryType { get; set; }
         public string TypeOfEmployment { get; set; }
+
+        public ICollection<JobApplication> JobApplications { get; set; }
     }
 }

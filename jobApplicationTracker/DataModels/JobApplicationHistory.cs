@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace jobApplicationTrackerApi.Models
+namespace jobApplicationTrackerApi.DataModels
 {
     public class JobApplicationHistory
     {
@@ -8,10 +8,9 @@ namespace jobApplicationTrackerApi.Models
         public Guid JobApplicationId { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
+        public Guid StatusId { get; set; }
 
+        public Status Status { get; set; }
         public JobApplication JobApplication { get; set; }
-
-
-        public ICollection<JobApplication> JobApplications { get; set; }
     }
 }

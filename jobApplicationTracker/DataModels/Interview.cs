@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace jobApplicationTrackerApi.Models
+﻿
+namespace jobApplicationTrackerApi.DataModels
 {
     public class Interview
     {
