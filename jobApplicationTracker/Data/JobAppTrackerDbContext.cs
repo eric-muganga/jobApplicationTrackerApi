@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace jobApplicationTrackerApi.Data;
 
-public class JobAppTrackerDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class JobAppTrackerDbContext : IdentityDbContext<ApplicationUser>
 {
     public JobAppTrackerDbContext(DbContextOptions<JobAppTrackerDbContext> options): base(options){}
     
@@ -44,11 +44,6 @@ public class JobAppTrackerDbContext : IdentityDbContext<ApplicationUser, Identit
             entity.HasOne(e => e.ContractType)
                 .WithMany(ct => ct.JobApplications)
                 .HasForeignKey(e => e.ContractTypeId)
-                .OnDelete(DeleteBehavior.Restrict);
-            
-            entity.HasOne(e => e.User)
-                .WithMany(u => u.JobApplications)
-                .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             entity.Property(e => e.CreatedAt)

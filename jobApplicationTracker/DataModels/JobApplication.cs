@@ -14,7 +14,6 @@ namespace jobApplicationTrackerApi.DataModels
         public Guid ContractTypeId { get; set; }
         public string? JobDescription { get; set; }
         public Guid UserId { get; set; }
-        public ApplicationUser User { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public Guid FinancialInformationId { get; set; }
         
