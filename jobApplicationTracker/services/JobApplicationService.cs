@@ -30,7 +30,11 @@ public class JobApplicationService : IJobApplicationService
 
         try
         {
-            var applications = await _context.JobApplications.ToListAsync();
+            var applications = await _context.JobApplications
+                .Include(j => j.Status)
+                .Include(j => j.ContractType)
+                .Include(j => j.FinancialInformation)
+                .ToListAsync();
 
             response.Data = applications;
             response.Message = "Job applications retrieved successfully";
@@ -40,7 +44,7 @@ public class JobApplicationService : IJobApplicationService
         catch (Exception ex) {
             response.Success = false;
             response.Data = null;
-            response.Message = "Error";
+            response.Message = "An error occurred while retrieving job applications.";
             response.ErrorMessages = new List<string> { ex.Message };
             response.StatusCode = HttpStatusCode.InternalServerError;
 
@@ -61,7 +65,11 @@ public class JobApplicationService : IJobApplicationService
         
         try
         {
-            var application = await _context.JobApplications.FindAsync(jobId);
+            var application = await _context.JobApplications
+                .Include(j => j.Status)
+                .Include(j => j.ContractType)
+                .Include(j => j.FinancialInformation)
+                .FirstOrDefaultAsync(j => j.Id == jobId);
 
             if (application == null)
             {
@@ -109,7 +117,7 @@ public class JobApplicationService : IJobApplicationService
         {
             response.Success = false;
             response.Data = null;
-            response.Message = "Error";
+            response.Message = "An error occurred while adding the job application.";
             response.ErrorMessages = new List<string> { e.Message };
             response.StatusCode = HttpStatusCode.InternalServerError;
         }
@@ -150,7 +158,7 @@ public class JobApplicationService : IJobApplicationService
         {
             response.Success = false;
             response.Data = null;
-            response.Message = "Error";
+            response.Message = "An error occurred while updating the job application.";
             response.ErrorMessages = new List<string> { e.Message };
             response.StatusCode = HttpStatusCode.InternalServerError;
         }
@@ -189,7 +197,103 @@ public class JobApplicationService : IJobApplicationService
         {
             response.Success = false;
             response.Data = null;
-            response.Message = "Error";
+            response.Message = "An error occurred while deleting the job application.";
+            response.ErrorMessages = new List<string> { e.Message };
+            response.StatusCode = HttpStatusCode.InternalServerError;
+        }
+        
+        return response;
+    }
+
+    /// <summary>
+    /// Updates the status of a job application based on a given statusId.
+    /// Could be part of a simple workflow.
+    /// </summary>
+    public async Task<ServiceResponse<JobApplication>> UpdateJobApplicationStatusAsync(Guid jobApplicationId,
+        Guid statusId)
+    {
+        var response = new ServiceResponse<JobApplication>();
+        try
+        {
+            var existing = await _context.JobApplications.FindAsync(jobApplicationId);
+            if (existing == null)
+            {
+                response.Success = false;
+                response.Message = "Job application not found.";
+                response.ErrorMessages = new List<string> { $"No application found with ID {jobApplicationId}" };
+                response.StatusCode = HttpStatusCode.NotFound;
+                return response;
+            }
+            
+            var statusExists = await _context.Statuses.AnyAsync(s => s.Id == statusId);
+
+            if (!statusExists)
+            {
+                response.Success = false;
+                response.Message = "Invalid Status.";
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+            
+            existing.StatusId = statusId;
+            await _context.SaveChangesAsync();
+            
+            response.Data = existing;
+            response.Message = "Job application status updated successfully.";
+            response.StatusCode = HttpStatusCode.OK;
+        }
+        catch (Exception e)
+        {
+            response.Success = false;
+            response.Data = null;
+            response.Message = "An error occurred while updating the status job application.";
+            response.ErrorMessages = new List<string> { e.Message };
+            response.StatusCode = HttpStatusCode.InternalServerError;
+        }
+        
+        return response;
+    }
+
+    /// <summary>
+    /// Associates an employment type (ContractType) with the job application
+    /// </summary>
+    public async Task<ServiceResponse<JobApplication>> UpdateJobApplicationContractTypeAsync(Guid jobApplicationId,
+        Guid contractTypeId)
+    {
+        var response = new ServiceResponse<JobApplication>();
+        try
+        {
+            var existing = await _context.JobApplications.FindAsync(jobApplicationId);
+            if (existing == null)
+            {
+                response.Success = false;
+                response.Message = "Job application not found.";
+                response.ErrorMessages = new List<string> { $"No application found with ID {jobApplicationId}" };
+                response.StatusCode = HttpStatusCode.NotFound;
+                return response;
+            }
+            
+            var contractTypeExists = await _context.ContractTypes.AnyAsync(c => c.Id == contractTypeId);
+            if (!contractTypeExists)
+            {
+                response.Success = false;
+                response.Message = "Invalid Contract Type.";
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+            
+            existing.ContractTypeId = contractTypeId;
+            await _context.SaveChangesAsync();
+            
+            response.Data = existing;
+            response.Message = "Job application contract type updated successfully.";
+            response.StatusCode = HttpStatusCode.OK;
+        }
+        catch (Exception e)
+        {
+            response.Success = false;
+            response.Data = null;
+            response.Message = "An error occurred while updating the Contract type job application.";
             response.ErrorMessages = new List<string> { e.Message };
             response.StatusCode = HttpStatusCode.InternalServerError;
         }

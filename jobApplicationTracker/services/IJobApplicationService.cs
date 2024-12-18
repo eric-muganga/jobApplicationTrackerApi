@@ -30,4 +30,17 @@ public interface IJobApplicationService
     /// Returns a simple response without a data payload.
     /// </summary>
     Task<ServiceResponse<JobApplication>> DeleteJobApplicationAsync(JobApplication jobApplication);
+
+    /// <summary>
+    /// Updates the status of a job application based on a given statusId.
+    /// Could be part of a simple workflow.
+    /// </summary>
+    Task<ServiceResponse<JobApplication>> UpdateJobApplicationStatusAsync(Guid jobApplicationId,
+        Guid statusId);
+
+    /// <summary>
+    /// Associates an employment type (ContractType) with the job application
+    /// </summary>
+    Task<ServiceResponse<JobApplication>> UpdateJobApplicationContractTypeAsync(Guid jobApplicationId,
+        Guid contractTypeId);
 }
