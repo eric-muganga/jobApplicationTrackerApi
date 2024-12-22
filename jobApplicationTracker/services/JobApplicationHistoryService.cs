@@ -4,7 +4,7 @@ using jobApplicationTrackerApi.Data;
 using jobApplicationTrackerApi.DataModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace jobApplicationTrackerApi.services;
+namespace jobApplicationTrackerApi.Services;
 
 public class JobApplicationHistoryService :IJobApplicationHistoryService
 {

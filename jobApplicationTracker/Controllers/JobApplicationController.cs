@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using jobApplicationTrackerApi.services;
+using jobApplicationTrackerApi.Services;
 using jobApplicationTrackerApi.DataModels;
 using jobApplicationTrackerApi.ViewModels;
 
@@ -14,22 +14,37 @@ namespace jobApplicationTrackerApi.Controllers;
 //[Authorize]
 public class JobApplicationController(IJobApplicationService jobApplicationService) : Controller 
 {
-    [HttpGet("")]       //Post Put Delete
-    //[ProducesResponseType(200)]
-    public IActionResult Get()
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
     {
-        var jobApplications = jobApplicationService.GetJobApplicationsAsync();
-        if(jobApplications == null)
+        var jobApplications =  await jobApplicationService.GetJobApplicationsAsync();
+        if(jobApplications.Data == Empty)           //Is it ok?
         {
-            return NotFound();
+            //var serviceResponse = new ServiceResponse<IEnumerable<JobApplication>>();
+            jobApplications.Message = "No instances of Job Applications were found";
+            jobApplications.StatusCode = HttpStatusCode.NotFound;
+            return NotFound(jobApplications);
         }
-        return Ok(jobApplications);
-    }   //Returns status code with a list of all job applications.
+
+        return Ok(jobApplications.Data);    //jobApplications / jobApplications.Data ?
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var jobApplication = await jobApplicationService.GetJobApplicationByGuidAsync(id);
+        //return GenerateResponse(response);
+    }
 
 }
 
 
 /*
+ *     public T Data { get; set; }
+    public bool Success { get; set; } = true;
+    public string? Message { get; set; } = null;
+    public List<string>? ErrorMessages { get; set; } = null;
+    public Enum StatusCode { get; set; }
  {
     /// <summary>
     /// Retrieves a list of all job applications.

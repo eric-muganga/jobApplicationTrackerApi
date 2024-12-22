@@ -1,6 +1,6 @@
 using jobApplicationTrackerApi.DataModels;
 
-namespace jobApplicationTrackerApi.services;
+namespace jobApplicationTrackerApi.Services;
 
 public interface IInterviewService
 {
