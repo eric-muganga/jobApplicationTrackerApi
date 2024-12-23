@@ -171,7 +171,7 @@ public class JobApplicationService : IJobApplicationService
     /// Deletes a job application by ID. If not found,
     /// returns an error. If successful, returns true.
     /// </summary>
-    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationAsync(Guid jobId)
+    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationAsync(JobApplication jobApplication)//(Guid jobId)
     {
         //var existing = await _context.JobApplications.FindAsync(jobId);
         //_context.JobApplications.Remove(existing);

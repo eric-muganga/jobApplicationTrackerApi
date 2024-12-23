@@ -18,8 +18,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IInterviewService>();
-builder.Services.AddScoped<I>();
+builder.Services.AddScoped<IInterviewService, InterviewService>();
+builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
+builder.Services.AddScoped<IJobApplicationHistoryService, JobApplicationHistoryService>();
 
 var app = builder.Build();
 

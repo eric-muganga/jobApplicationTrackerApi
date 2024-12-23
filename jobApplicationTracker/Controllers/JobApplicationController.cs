@@ -95,15 +95,15 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     {
         try
         {
-            var delited = await jobApplicationService.DeleteJobApplicationAsync(jobId);
-            if(delited == 0)
-                return NotFound($"JobApplication with id={jobId} was not found");
+            //var delited = await jobApplicationService.DeleteJobApplicationAsync(jobId);
+            //if(delited == 0)
+            //    return NotFound($"JobApplication with id={jobId} was not found");
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok(ServiceResponse);
+        return Ok();
     }
 
     /// <summary>
