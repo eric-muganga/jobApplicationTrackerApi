@@ -35,6 +35,7 @@ public class JobApplicationService : IJobApplicationService
                 .Include(j => j.ContractType)
                 .Include(j => j.FinancialInformation)
                 .ToListAsync();
+                                                                                    //if(no objects) return bad request
 
             response.Data = applications;
             response.Message = "Job applications retrieved successfully";
@@ -170,8 +171,14 @@ public class JobApplicationService : IJobApplicationService
     /// Deletes a job application by ID. If not found,
     /// returns an error. If successful, returns true.
     /// </summary>
-    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationAsync(JobApplication jobApplication)
+    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationAsync(Guid jobId)
     {
+        //var existing = await _context.JobApplications.FindAsync(jobId);
+        //_context.JobApplications.Remove(existing);
+        //int changed = await _context.SaveChangesAsync();
+        //return changed;
+
+
         var response = new ServiceResponse<JobApplication>();
         try
         {

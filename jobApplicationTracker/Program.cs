@@ -1,5 +1,6 @@
 using jobApplicationTrackerApi.Data;
 using jobApplicationTrackerApi.DataModels;
+using jobApplicationTrackerApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,6 +17,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<JobAppTrackerDbContext>();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IInterviewService>();
+builder.Services.AddScoped<I>();
 
 var app = builder.Build();
 
