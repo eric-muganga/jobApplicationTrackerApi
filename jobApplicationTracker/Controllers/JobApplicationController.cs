@@ -24,21 +24,7 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     public async Task<IActionResult> GetAllJobApplications()
     {
         var jobApplications =  await jobApplicationService.GetJobApplicationsAsync();
-        try
-        {
-            if (jobApplications.Data == Empty)           //Is it ok?
-            {
-                jobApplications.Message = "No instances of Job Applications were found";
-                jobApplications.StatusCode = HttpStatusCode.NotFound;
-                return NotFound(jobApplications);
-            }
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex);
-        }
-
-        return GenerateResponse(jobApplications);    //jobApplications / jobApplications.Data ?
+        return GenerateResponse(jobApplications);
     }
 
     /// <summary>
@@ -55,12 +41,17 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     /// Adds a new job application and returns the created entity.
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> CreateJobApplication([FromBody] JobApplication jobApplication)
+    public async Task<IActionResult> CreateJobApplication([FromBody] JobApplicationView jobApplicationView)
     {
-        var jobAppCreated = new ServiceResponse<JobApplication>();
+        var jobAppCreated = new ServiceResponse<JobApplicationView>();
         try
         {
-            jobAppCreated = await jobApplicationService.AddJobApplicationAsync(jobApplication);
+            JobApplication jobApplication = new();
+            // map here see automapper
+            // add id
+            var jobAppCreatedDto = await jobApplicationService.AddJobApplicationAsync(jobApplication);
+            // reverse map or
+            // jobApplicationView.Id = jobAppCreatedDto.Id
         }
         catch (Exception ex)
         {
