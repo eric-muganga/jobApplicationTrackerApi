@@ -23,28 +23,28 @@ public static class HttpContextHelper
         return claim?.Value ?? userId;
     }
 
-    public static IReadOnlyCollection<T> GetUserRoles<T>(ClaimsPrincipal? user) where T : struct, Enum
-    {
-        var userRoles = new Collection<T>();
-        var identity = user?.Identity as ClaimsIdentity;
+    //public static IReadOnlyCollection<T> GetUserRoles<T>(ClaimsPrincipal? user) where T : struct, Enum
+    //{
+    //    var userRoles = new Collection<T>();
+    //    var identity = user?.Identity as ClaimsIdentity;
 
-        var userRoleClaims = identity?.Claims.Where(c => c.Type == ClaimTypes.Role);
+    //    var userRoleClaims = identity?.Claims.Where(c => c.Type == ClaimTypes.Role);
 
-        if (userRoleClaims == null)
-        {
-            return userRoles;
-        }
+    //    if (userRoleClaims == null)
+    //    {
+    //        return userRoles;
+    //    }
 
-        foreach (var roleClaim in userRoleClaims)
-        {
-            if (Enum.TryParse(roleClaim.Value, out T userRole))
-            {
-                userRoles.Add(userRole);
-            }
-        }
+    //    foreach (var roleClaim in userRoleClaims)
+    //    {
+    //        if (Enum.TryParse(roleClaim.Value, out T userRole))
+    //        {
+    //            userRoles.Add(userRole);
+    //        }
+    //    }
 
-        return userRoles;
-    }
+    //    return userRoles;
+    //}
 
     public static string GetUserInfo(ClaimsPrincipal? user, string type)
     {

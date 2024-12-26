@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using System.Threading.Tasks;
 using Azure;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 
 namespace jobApplicationTrackerApi.Controllers;
 
@@ -16,8 +17,14 @@ namespace jobApplicationTrackerApi.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 //[Authorize]
-public class JobApplicationController(IJobApplicationService jobApplicationService, IMapper mapper) : JobAppControllerBase
+public class JobApplicationController(IJobApplicationService jobApplicationService, IMapper mapper) : JobAppControllerBase  // , UserManager<ApplicationUser> userManager - for testing purposes
 {
+
+    //public async Task<IActionResult> CreateUser(ApplicationUser user)
+    //{
+    //    await userManager.CreateAsync(user);
+    //    return Ok(user);
+    //}
 
     /// <summary>
     /// Retrieves a list of all job applications.
