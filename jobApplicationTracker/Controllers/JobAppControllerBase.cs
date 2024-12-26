@@ -1,4 +1,5 @@
-﻿using jobApplicationTrackerApi.Services;
+﻿using jobApplicationTrackerApi.Helpers;
+using jobApplicationTrackerApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -9,8 +10,8 @@ namespace jobApplicationTrackerApi.Controllers;
 //[Authorize]
 public class JobAppControllerBase : ControllerBase
 {
-    //public string userId => HttpContextHelper.GetUserId(User);
-    //protected string userEmail => HttpContextHelper.GetUserInfo(User, "Email");
+    public string userId => HttpContextHelper.GetUserId(User);
+    protected string userEmail => HttpContextHelper.GetUserInfo(User, "Email");
 
     /// <summary>
     /// Helping function to manage response types 

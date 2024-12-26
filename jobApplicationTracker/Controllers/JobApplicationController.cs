@@ -65,6 +65,16 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
             var jobAppCreatedDto = await jobApplicationService.AddJobApplicationAsync(jobApplication);
             // reverse map or
             // jobApplicationView.Id = jobAppCreatedDto.Id
+
+
+            
+        //ex data - view (in controller)
+        //var jobApplication = new JobApplication { Id = 1, JobTitle = "Software Developer", UserId = 123 };
+        //var jobApplicationView = _mapper.Map<JobApplicationView>(jobApplication);
+
+        //ex view - data (in controller)
+        //var jobApplicationView = new JobApplicationView { Id = 1, JobTitle = "Software Developer" };
+        //var jobApplication = _mapper.Map<JobApplication>(jobApplicationView);
         }
         catch (Exception ex)
         {
