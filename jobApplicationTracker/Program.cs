@@ -1,3 +1,4 @@
+using jobApplicationTrackerApi.Controllers;
 using jobApplicationTrackerApi.Data;
 using jobApplicationTrackerApi.DataModels;
 using jobApplicationTrackerApi.Services;
@@ -18,9 +19,13 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAutoMapper(typeof(MappingProfile));     //typeof(Program)
+
 builder.Services.AddScoped<IInterviewService, InterviewService>();
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 builder.Services.AddScoped<IJobApplicationHistoryService, JobApplicationHistoryService>();
+
+//AddAuthentication here
 
 var app = builder.Build();
 

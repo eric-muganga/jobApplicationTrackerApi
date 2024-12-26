@@ -8,6 +8,7 @@ using jobApplicationTrackerApi.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using System.Threading.Tasks;
 using Azure;
+using AutoMapper;
 
 namespace jobApplicationTrackerApi.Controllers;
 
@@ -15,16 +16,25 @@ namespace jobApplicationTrackerApi.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 //[Authorize]
-public class JobApplicationController(IJobApplicationService jobApplicationService) : Controller 
+public class JobApplicationController(IJobApplicationService jobApplicationService, IMapper mapper) : JobAppControllerBase
 {
+
     /// <summary>
     /// Retrieves a list of all job applications.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> GetAllJobApplications()
+    public async Task<IActionResult> GetAllJobApplications()        //make a view model and return it?
     {
-        var jobApplications =  await jobApplicationService.GetJobApplicationsAsync();
+        var jobApplications =  await jobApplicationService.GetJobApplicationsAsync();// filter by current user id
         return GenerateResponse(jobApplications);
+
+        /*        var jobApplication = new JobApplication { Id = 1, JobTitle = "Software Developer", UserId = 123 };
+        */
+        // Use AutoMapper to convert to JobApplicationView
+        var jobApplicationsView = mapper.Map<IEnumerable<JobApplicationView>>(jobApplications);////// TODO: XXXXX
+
+
+        return Ok(jobApplicationsView);
     }
 
     /// <summary>
@@ -46,7 +56,10 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
         var jobAppCreated = new ServiceResponse<JobApplicationView>();
         try
         {
-            JobApplication jobApplication = new();
+            var jobApplication = mapper.Map<JobApplication>(jobApplicationView);
+            //jobApplication.UserId = userId;                                           //Uncomment
+
+            //JobApplication jobApplication = new();
             // map here see automapper
             // add id
             var jobAppCreatedDto = await jobApplicationService.AddJobApplicationAsync(jobApplication);
@@ -115,18 +128,6 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     {
         var response = await jobApplicationService.UpdateJobApplicationContractTypeAsync(id, contractTypeId);
         return GenerateResponse(response);
-    }
-
-    //Helping function to manage response types 
-    private IActionResult GenerateResponse<T>(ServiceResponse<T> response)
-    {
-        if (!response.Success)
-            return StatusCode(Convert.ToInt32(response.StatusCode), response);
-
-        if (response.StatusCode.Equals(HttpStatusCode.Created))
-            return StatusCode(Convert.ToInt32(response.StatusCode), response);
-
-        return Ok(response);
     }
 
 }
