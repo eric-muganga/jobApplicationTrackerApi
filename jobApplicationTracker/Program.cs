@@ -23,7 +23,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 
 
- builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<JobAppTrackerDbContext>()
     .AddDefaultTokenProviders();
 
@@ -70,7 +70,6 @@ builder.Services.AddAuthentication(options =>
 //    .AddEntityFrameworkStores<JobAppTrackerDbContext>()
 //    .AddDefaultTokenProviders();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -81,7 +80,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.MapIdentityApi<ApplicationUser>();
+//app.MapIdentityApi<ApplicationUser>();
 
 app.UseHttpsRedirection();
 
