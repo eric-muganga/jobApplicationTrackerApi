@@ -17,14 +17,8 @@ namespace jobApplicationTrackerApi.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 //[Authorize]
-public class JobApplicationController(IJobApplicationService jobApplicationService, IMapper mapper) : JobAppControllerBase  // , UserManager<ApplicationUser> userManager - for testing purposes
+public class JobApplicationController(IJobApplicationService jobApplicationService, IMapper mapper) : JobAppControllerBase
 {
-
-    //public async Task<IActionResult> CreateUser(ApplicationUser user)
-    //{
-    //    await userManager.CreateAsync(user);
-    //    return Ok(user);
-    //}
 
     /// <summary>
     /// Retrieves a list of all job applications.
@@ -114,17 +108,16 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteJobApplication([FromRoute] Guid jobId)
     {
+        var response = new ServiceResponse<JobApplication>();
         try
         {
-            //var delited = await jobApplicationService.DeleteJobApplicationAsync(jobId);
-            //if(delited == 0)
-            //    return NotFound($"JobApplication with id={jobId} was not found");
+            response = await jobApplicationService.DeleteJobApplicationByIdAsync(jobId);
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok();
+        return Ok(response);
     }
 
     /// <summary>

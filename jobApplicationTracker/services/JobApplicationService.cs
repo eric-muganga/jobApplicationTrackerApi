@@ -35,7 +35,7 @@ public class JobApplicationService : IJobApplicationService
                 .Include(j => j.ContractType)
                 .Include(j => j.FinancialInformation)
                 .ToListAsync();
-                                                                                    //if(no objects) return bad request
+            
 
             response.Data = applications;
             response.Message = "Job applications retrieved successfully";
@@ -171,24 +171,19 @@ public class JobApplicationService : IJobApplicationService
     /// Deletes a job application by ID. If not found,
     /// returns an error. If successful, returns true.
     /// </summary>
-    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationAsync(JobApplication jobApplication)//(Guid jobId)
+    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationByIdAsync(Guid jobId)
     {
-        //var existing = await _context.JobApplications.FindAsync(jobId);
-        //_context.JobApplications.Remove(existing);
-        //int changed = await _context.SaveChangesAsync();
-        //return changed;
-
 
         var response = new ServiceResponse<JobApplication>();
         try
         {
-            var existing =await _context.JobApplications.FindAsync(jobApplication.Id);
+            var existing =await _context.JobApplications.FindAsync(jobId);
 
             if (existing == null)
             {
                 response.Success = false;
                 response.Message = "Job application not found.";
-                response.ErrorMessages = new List<string> { $"No application found with ID {jobApplication.Id}" };
+                response.ErrorMessages = new List<string> { $"No application found with ID {jobId}" };
                 response.StatusCode = HttpStatusCode.NotFound;
                 return response;
             }

@@ -29,7 +29,7 @@ public interface IJobApplicationService
     /// Deletes a job application by its unique identifier.
     /// Returns a simple response without a data payload.
     /// </summary>
-    Task<ServiceResponse<JobApplication>> DeleteJobApplicationAsync(JobApplication jobApplication);
+    Task<ServiceResponse<JobApplication>> DeleteJobApplicationByIdAsync(Guid jobId); //JobApplication jobApplication
 
     /// <summary>
     /// Updates the status of a job application based on a given statusId.
