@@ -11,7 +11,7 @@ namespace jobApplicationTrackerApi.Controllers;
 public class JobAppControllerBase : ControllerBase
 {
     public string userId => HttpContextHelper.GetUserId(User);
-    //protected string userEmail => HttpContextHelper.GetUserInfo(User, "Email");
+    protected string userEmail => HttpContextHelper.GetUserInfo(User, "Email");
 
     /// <summary>
     /// Helping function to manage response types
