@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace jobApplicationTrackerApi.Services;
 
 /// <summary>
@@ -10,5 +12,5 @@ public class ServiceResponse<T> //where T : class
     public bool Success { get; set; } = true;
     public string? Message { get; set; } = null;
     public List<string>? ErrorMessages { get; set; } = null;
-    public Enum StatusCode { get; set; }
+    public HttpStatusCode StatusCode { get; set; }  // Enum
 }

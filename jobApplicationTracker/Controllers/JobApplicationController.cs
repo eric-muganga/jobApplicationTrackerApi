@@ -24,28 +24,32 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     /// Retrieves a list of all job applications.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> GetAllJobApplications()        //make a view model and return it?
+    public async Task<IActionResult> GetAllJobApplications()
     {
-        var jobApplications =  await jobApplicationService.GetJobApplicationsAsync();// filter by current user id
-        return GenerateResponse(jobApplications);
+        var returnModel = new ServiceResponse<JobApplicationView>();
+        var jobApplications =  await jobApplicationService.GetJobApplicationsAsync(userId);
 
-        /*        var jobApplication = new JobApplication { Id = 1, JobTitle = "Software Developer", UserId = 123 };
-        */
-        // Use AutoMapper to convert to JobApplicationView
-        var jobApplicationsView = mapper.Map<IEnumerable<JobApplicationView>>(jobApplications);////// TODO: XXXXX
+        var viewModel = mapper.Map<IEnumerable<JobApplicationView>>(jobApplications.Data);
+        //returnModel = mapper.Map<ServiceResponse<JobApplicationView>>(jobApplications);
 
-
-        return Ok(jobApplicationsView);
+        //return GenerateResponse(jobApplications);
+        return Ok(viewModel);
     }
 
     /// <summary>
     /// Retrieves a specific job application by its unique identifier.
     /// </summary>
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetJobApplicationById(Guid jobId)
+    public async Task<IActionResult> GetJobApplicationById(Guid id)
     {
-        var jobApplication = await jobApplicationService.GetJobApplicationByGuidAsync(jobId);
-        return GenerateResponse(jobApplication);
+        var returnModel = new ServiceResponse<JobApplicationView>();    
+
+        var jobApplication = await jobApplicationService.GetJobApplicationByGuidAsync(id, userId);
+        returnModel = mapper.Map<ServiceResponse<JobApplicationView>>(jobApplication);
+
+        //returnModel = jobApplication;
+        //jobApplication.Data = mapper.Map<JobApplication>(jobAppView);
+        return GenerateResponse(returnModel);
     }
 
     /// <summary>
@@ -54,34 +58,35 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     [HttpPost]
     public async Task<IActionResult> CreateJobApplication([FromBody] JobApplicationView jobApplicationView)
     {
-        var jobAppCreated = new ServiceResponse<JobApplicationView>();
+        var returnModel = new ServiceResponse<JobApplicationView>();
         try
         {
             var jobApplication = mapper.Map<JobApplication>(jobApplicationView);
-            //jobApplication.UserId = userId;                                           //Uncomment
+            jobApplication.UserId = Guid.Parse(userId);
 
-            //JobApplication jobApplication = new();
-            // map here see automapper
-            // add id
             var jobAppCreatedDto = await jobApplicationService.AddJobApplicationAsync(jobApplication);
-            // reverse map or
-            // jobApplicationView.Id = jobAppCreatedDto.Id
 
+            returnModel.Success = jobAppCreatedDto.Success;
+            returnModel.Message = jobAppCreatedDto.Message;
+            returnModel.ErrorMessages = jobAppCreatedDto.ErrorMessages;
+            returnModel.StatusCode = jobAppCreatedDto.StatusCode;
 
-            
-        //ex data - view (in controller)
-        //var jobApplication = new JobApplication { Id = 1, JobTitle = "Software Developer", UserId = 123 };
-        //var jobApplicationView = _mapper.Map<JobApplicationView>(jobApplication);
+            jobApplicationView.Id = jobAppCreatedDto.Data.Id;   //or reverse map
+            returnModel.Data = jobApplicationView;
 
-        //ex view - data (in controller)
-        //var jobApplicationView = new JobApplicationView { Id = 1, JobTitle = "Software Developer" };
-        //var jobApplication = _mapper.Map<JobApplication>(jobApplicationView);
+            /*
+        var jobApplications =  await jobApplicationService.GetJobApplicationsAsync(userId);
+
+        var viewModel = mapper.Map<IEnumerable<JobApplicationView>>(jobApplications.Data);
+        //returnModel = mapper.Map<ServiceResponse<JobApplicationView>>(jobApplications);
+*/
+
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return GenerateResponse(jobAppCreated);
+        return Ok(returnModel);
     }
 
     /// <summary>
@@ -92,7 +97,7 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     {
         try
         {
-            await jobApplicationService.UpdateJobApplicationAsync(jobApplication);
+            await jobApplicationService.UpdateJobApplicationAsync(jobApplication, userId);
         }
         catch (Exception ex)
         {
@@ -106,12 +111,12 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     /// Returns a simple response without a data payload.
     /// </summary>
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteJobApplication([FromRoute] Guid jobId)
+    public async Task<IActionResult> DeleteJobApplication([FromRoute] Guid id)
     {
         var response = new ServiceResponse<JobApplication>();
         try
         {
-            response = await jobApplicationService.DeleteJobApplicationByIdAsync(jobId);
+            response = await jobApplicationService.DeleteJobApplicationByIdAsync(id, userId);
         }
         catch (Exception ex)
         {
@@ -126,7 +131,7 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     [HttpPatch("{id:guid}/status/{statusId:guid}")]
     public async Task<IActionResult> UpdateStatus(Guid id, Guid statusId)
     {
-        var response = await jobApplicationService.UpdateJobApplicationStatusAsync(id, statusId);
+        var response = await jobApplicationService.UpdateJobApplicationStatusAsync(id, statusId, userId);
         return GenerateResponse(response);
     }
 
@@ -136,7 +141,7 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     [HttpPatch("{id:guid}/contract-type/{contractTypeId:guid}")]
     public async Task<IActionResult> UpdateContractType(Guid id, Guid contractTypeId)
     {
-        var response = await jobApplicationService.UpdateJobApplicationContractTypeAsync(id, contractTypeId);
+        var response = await jobApplicationService.UpdateJobApplicationContractTypeAsync(id, contractTypeId, userId);
         return GenerateResponse(response);
     }
 

@@ -2,6 +2,7 @@ using System.Net;
 using Azure;
 using jobApplicationTrackerApi.Data;
 using jobApplicationTrackerApi.DataModels;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 
 namespace jobApplicationTrackerApi.Services;
@@ -24,13 +25,14 @@ public class JobApplicationService : IJobApplicationService
     /// <summary>
     /// Retrieves all job applications and returns them in a successful or error response.
     /// </summary>
-    public async Task<ServiceResponse<IEnumerable<JobApplication>>> GetJobApplicationsAsync()
+    public async Task<ServiceResponse<IEnumerable<JobApplication>>> GetJobApplicationsAsync(string userId)
     {
         var response = new ServiceResponse<IEnumerable<JobApplication>>();
 
         try
         {
             var applications = await _context.JobApplications
+                .Where(x => x.UserId == Guid.Parse(userId))
                 .Include(j => j.Status)
                 .Include(j => j.ContractType)
                 .Include(j => j.FinancialInformation)
@@ -60,13 +62,14 @@ public class JobApplicationService : IJobApplicationService
     /// Retrieves a single job application by GUID. 
     /// If not found, returns a response indicating failure.
     /// </summary>
-    public async Task<ServiceResponse<JobApplication>> GetJobApplicationByGuidAsync(Guid jobId)
+    public async Task<ServiceResponse<JobApplication>> GetJobApplicationByGuidAsync(Guid jobId, string userId)
     {
         var response = new ServiceResponse<JobApplication>();
         
         try
         {
             var application = await _context.JobApplications
+                .Where(x => x.UserId == Guid.Parse(userId))
                 .Include(j => j.Status)
                 .Include(j => j.ContractType)
                 .Include(j => j.FinancialInformation)
@@ -130,14 +133,16 @@ public class JobApplicationService : IJobApplicationService
     /// Updates an existing job application.
     /// If the application does not exist, returns an error.
     /// </summary>
-    public async Task<ServiceResponse<JobApplication>> UpdateJobApplicationAsync(JobApplication jobApplication)
+    public async Task<ServiceResponse<JobApplication>> UpdateJobApplicationAsync(JobApplication jobApplication, string userId)
     {
         var response = new ServiceResponse<JobApplication>();
 
         try
         {
-            var existing = await _context.JobApplications.FindAsync(jobApplication.Id);
-        
+            var existing = await _context.JobApplications
+                .Where(x => x.UserId == Guid.Parse(userId))
+                .FirstOrDefaultAsync(j => j.Id == jobApplication.Id);
+
             if (existing == null)
             {
                 response.Success = false;
@@ -171,13 +176,15 @@ public class JobApplicationService : IJobApplicationService
     /// Deletes a job application by ID. If not found,
     /// returns an error. If successful, returns true.
     /// </summary>
-    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationByIdAsync(Guid jobId)
+    public async Task<ServiceResponse<JobApplication>> DeleteJobApplicationByIdAsync(Guid jobId, string userId)
     {
 
         var response = new ServiceResponse<JobApplication>();
         try
         {
-            var existing =await _context.JobApplications.FindAsync(jobId);
+            var existing = await _context.JobApplications
+            .Where(x => x.UserId == Guid.Parse(userId))
+            .FirstOrDefaultAsync(j => j.Id == jobId);
 
             if (existing == null)
             {
@@ -212,12 +219,15 @@ public class JobApplicationService : IJobApplicationService
     /// Could be part of a simple workflow.
     /// </summary>
     public async Task<ServiceResponse<JobApplication>> UpdateJobApplicationStatusAsync(Guid jobApplicationId,
-        Guid statusId)
+        Guid statusId, string userId)
     {
         var response = new ServiceResponse<JobApplication>();
         try
         {
-            var existing = await _context.JobApplications.FindAsync(jobApplicationId);
+            var existing = await _context.JobApplications
+                .Where(x => x.UserId == Guid.Parse(userId))
+                .FirstOrDefaultAsync(j => j.Id == jobApplicationId);
+
             if (existing == null)
             {
                 response.Success = false;
@@ -260,12 +270,15 @@ public class JobApplicationService : IJobApplicationService
     /// Associates an employment type (ContractType) with the job application
     /// </summary>
     public async Task<ServiceResponse<JobApplication>> UpdateJobApplicationContractTypeAsync(Guid jobApplicationId,
-        Guid contractTypeId)
+        Guid contractTypeId, string userId)
     {
         var response = new ServiceResponse<JobApplication>();
         try
         {
-            var existing = await _context.JobApplications.FindAsync(jobApplicationId);
+            var existing = await _context.JobApplications
+                .Where(x => x.UserId == Guid.Parse(userId))
+                .FirstOrDefaultAsync(j => j.Id == jobApplicationId);
+
             if (existing == null)
             {
                 response.Success = false;

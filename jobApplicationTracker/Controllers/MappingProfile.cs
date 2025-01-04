@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using jobApplicationTrackerApi.DataModels;
+using jobApplicationTrackerApi.Services;
 using jobApplicationTrackerApi.ViewModels;
 
 namespace jobApplicationTrackerApi.Controllers;
@@ -28,5 +29,8 @@ public class MappingProfile : Profile
 
         CreateMap<JobApplicationHistoryView, JobApplicationHistory>()
             .ForMember(dest => dest.StatusId, opt => opt.MapFrom(src => Guid.Parse(src.StatusName)));
+
+
+        CreateMap<ServiceResponse<JobApplication>,  ServiceResponse<JobApplicationView>>().ReverseMap();
     }
 }
