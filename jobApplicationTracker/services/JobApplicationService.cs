@@ -107,7 +107,7 @@ public class JobApplicationService : IJobApplicationService
     /// </summary>
     public async Task<ServiceResponse<JobApplication>> AddJobApplicationAsync(JobApplication jobApplication)
     {
-        var response = new ServiceResponse<JobApplication>();
+        var response = new ServiceResponse<JobApplication>();   
         try
         {
             _context.JobApplications.Add(jobApplication);
