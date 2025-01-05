@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace jobApplicationTrackerApi.DataModels
+﻿namespace jobApplicationTrackerApi.DataModels
 {
     public class JobApplicationHistory
     {
