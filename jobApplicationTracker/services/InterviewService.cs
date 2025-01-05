@@ -161,6 +161,30 @@ public class InterviewService : IInterviewService
         var response = new ServiceResponse<byte[]>();
         try
         {
+            // Check if the JobApplication exists
+            var jobApplicationExists = await _context.JobApplications
+                .AnyAsync(j => j.Id == jobApplicationId);
+
+            if (!jobApplicationExists)
+            {
+                response.Success = false;
+                response.Message = $"JobApplication with ID {jobApplicationId} does not exist.";
+                response.StatusCode = HttpStatusCode.NotFound;
+                return response;
+            }
+
+            // Check if jobApplication contains any interviews
+            var interviews = await _context.Interviews
+                .Where(i => i.JobApplicationId == jobApplicationId)
+                .ToListAsync();
+            if (interviews.Count == 0)
+            {
+                response.Success = false;
+                response.Message = $"JobApplication with ID {jobApplicationId} does not contain any Interviews.";
+                response.StatusCode = HttpStatusCode.NotFound;
+                return response;
+            }
+
             // Retrieve interviews
             var interviewsResponse = await _context.Interviews
                 .Where(i => i.JobApplicationId == jobApplicationId)

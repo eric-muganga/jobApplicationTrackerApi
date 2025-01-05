@@ -44,7 +44,7 @@ public class InterviewController(IInterviewService interviewService, IMapper map
             var interview = mapper.Map<Interview>(interviewView);
             var interviewResponse = await interviewService.AddInterviewAsync(interview);
 
-            returnModel = mapper.Map<ServiceResponse<InterviewView>>(interviewResponse);
+            returnModel = mapper.Map<ServiceResponse<InterviewView>>(interviewResponse);    //
         }
         catch (Exception ex)
         {
@@ -94,7 +94,7 @@ public class InterviewController(IInterviewService interviewService, IMapper map
             return BadRequest(ex.Message);
         }
 
-        return Ok(returnModel);
+        return GenerateResponse(returnModel);
     }
 
     /// <summary>

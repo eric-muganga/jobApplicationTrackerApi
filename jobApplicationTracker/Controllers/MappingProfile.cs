@@ -18,7 +18,7 @@ public class MappingProfile : Profile
 
         CreateMap<Status, StatusView>().ReverseMap();
 
-        CreateMap<Interview,InterviewView>().ReverseMap();
+        CreateMap<Interview, InterviewView>().ReverseMap();
 
         CreateMap<FinancialInformation, FinancialInformationView>().ReverseMap();
 
@@ -31,6 +31,11 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.StatusId, opt => opt.MapFrom(src => Guid.Parse(src.StatusName)));
 
 
+        //CreateMap<InterviewView, Interview>();
+
+
         CreateMap<ServiceResponse<JobApplication>,  ServiceResponse<JobApplicationView>>().ReverseMap();
+
+        CreateMap<ServiceResponse<Interview>, ServiceResponse<InterviewView>>().ReverseMap();
     }
 }
