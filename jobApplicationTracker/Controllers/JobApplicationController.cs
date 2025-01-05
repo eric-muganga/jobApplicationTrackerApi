@@ -16,7 +16,7 @@ namespace jobApplicationTrackerApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize]
+[Authorize]
 public class JobApplicationController(IJobApplicationService jobApplicationService, IMapper mapper) : JobAppControllerBase
 {
 

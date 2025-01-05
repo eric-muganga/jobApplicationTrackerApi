@@ -11,6 +11,7 @@ using System;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Any;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -65,10 +66,6 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtAuthentication();
-
-//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-//    .AddEntityFrameworkStores<JobAppTrackerDbContext>()
-//    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 

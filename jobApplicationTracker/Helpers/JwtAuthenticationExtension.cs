@@ -22,9 +22,9 @@ public static class JwtAuthenticationExtension
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = signingKey,
                     ValidateIssuer = true,
-                    ValidIssuer = "JobApplicationIssuer",
+                    ValidIssuer = "JobAppTrackerIssuer",
                     ValidateAudience = true,
-                    ValidAudience = "JobApplicationIssuer",
+                    ValidAudience = "JobAppTrackerIssuer",
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };

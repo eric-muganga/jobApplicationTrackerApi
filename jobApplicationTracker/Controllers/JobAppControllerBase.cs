@@ -1,6 +1,7 @@
 ﻿using jobApplicationTrackerApi.Helpers;
 using jobApplicationTrackerApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
 namespace jobApplicationTrackerApi.Controllers;

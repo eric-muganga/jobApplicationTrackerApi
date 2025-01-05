@@ -192,11 +192,11 @@ public class UserController(
             new(JwtRegisteredClaimNames.Exp,
                 new DateTimeOffset(now.Add(lifetime)).ToUniversalTime().ToUnixTimeSeconds().ToString(),
                 ClaimValueTypes.Integer64),
-            new(ClaimTypes.Role, userMainInfo.RoleId.ToString())
+            //new(ClaimTypes.Role, userMainInfo.RoleId.ToString())
         };
 
         //TODO update secret key
-        var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("a6e0cbea095e21c4958237f2fdd3586f6ddd557ac9e672c8bbdb266d89d45db2"));
+        var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("a6e0cbea095e2e237f2fdd3586f6ddd557ac9d45db2672c8bbdb266d891c4958"));
         var jwt = new JwtSecurityToken("JobAppTrackerIssuer", "JobAppTrackerIssuer", claims,
             now, now.Add(lifetime), new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256));
 

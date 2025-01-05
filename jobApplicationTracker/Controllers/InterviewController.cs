@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize]
+[Authorize] 
 public class InterviewController(IInterviewService interviewService, IMapper mapper) : JobAppControllerBase
 {
     /// <summary>
