@@ -1,6 +1,4 @@
-﻿
-
-namespace jobApplicationTrackerApi.DataModels
+﻿namespace jobApplicationTrackerApi.DataModels
 {
     public class JobApplication
     {

@@ -1,9 +1,22 @@
 using System.Net;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
 using jobApplicationTrackerApi.Data;
 using jobApplicationTrackerApi.DataModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace jobApplicationTrackerApi.services;
+using Ical.Net;
+using Ical.Net.CalendarComponents;
+using Ical.Net.DataTypes;
+using Ical.Net.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace jobApplicationTrackerApi.Services;
 
 public class InterviewService : IInterviewService
 {
@@ -26,6 +39,7 @@ public class InterviewService : IInterviewService
 
             response.Data = interviews;
             response.Message = "Interviews retrieved successfully.";
+            response.StatusCode = HttpStatusCode.OK;
             return response;
         }
         catch (Exception e)
@@ -147,13 +161,37 @@ public class InterviewService : IInterviewService
         var response = new ServiceResponse<byte[]>();
         try
         {
-            // Retrieve interviews
+            // Check if the JobApplication exists
+            var jobApplicationExists = await _context.JobApplications
+                .AnyAsync(j => j.Id == jobApplicationId);
+
+            if (!jobApplicationExists)
+            {
+                response.Success = false;
+                response.Message = $"JobApplication with ID {jobApplicationId} does not exist.";
+                response.StatusCode = HttpStatusCode.NotFound;
+                return response;
+            }
+
+            // Check if jobApplication contains any interviews
             var interviews = await _context.Interviews
+                .Where(i => i.JobApplicationId == jobApplicationId)
+                .ToListAsync();
+            if (interviews.Count == 0)
+            {
+                response.Success = false;
+                response.Message = $"JobApplication with ID {jobApplicationId} does not contain any Interviews.";
+                response.StatusCode = HttpStatusCode.NotFound;
+                return response;
+            }
+
+            // Retrieve interviews
+            var interviewsResponse = await _context.Interviews
                 .Where(i => i.JobApplicationId == jobApplicationId)
                 .ToListAsync();
 
             // Convert interviews to ICS format (placeholder logic)
-            byte[] icsData = GenerateICSFile(interviews);
+            byte[] icsData = GenerateICSFile(interviewsResponse);
 
             response.Data = icsData;
             response.Message = "ICS file generated successfully.";
@@ -169,15 +207,54 @@ public class InterviewService : IInterviewService
 
         return response;
     }
-    
-    
+
+
     /// <summary>
     /// Placeholder method for generating an ICS file from interview data.
     /// Replace this with actual ICS generation logic.
     /// </summary>
-    private byte[] GenerateICSFile(IEnumerable<Interview> interviews)
+    private byte[] GenerateICSFile(IEnumerable<Interview> interviewsResponse)
     {
-        // Implement ICS generation logic here
-        return new byte[0];
+        // Create a new calendar
+        var calendar = new Calendar();
+
+        // Convert each interview to an iCalendar event
+        foreach (var interview in interviewsResponse)
+        {
+            if (interview.Date == null)
+            {
+                continue; // Skip if Date is not specified
+            }
+
+            var startTime = interview.Date.Value;
+            var endTime = startTime.AddHours(1);
+
+            var calendarEvent = new CalendarEvent
+            {
+                Summary = interview.Type ?? "Interview", // Type as the summary
+                Description = interview.Notes, // Notes as the description
+                //Location = interview.Location, // Use Location if available
+                DtStart = new CalDateTime(startTime), // Start time
+                DtEnd = new CalDateTime(endTime), // End time
+                Uid = interview.Id.ToString() // Unique identifier
+            };
+
+            // Add Location only if it's not null or empty
+            //if (!string.IsNullOrWhiteSpace(interview.Location))
+            //{
+            //    calendarEvent.Location = interview.Location;
+            //}
+
+            calendar.Events.Add(calendarEvent);
+        }
+
+        // Serialize the calendar to an iCalendar (.ics) format
+        var serializer = new CalendarSerializer();
+        var serializedCalendar = serializer.SerializeToString(calendar);
+
+        // Convert the serialized string to a byte array
+        var icsData = System.Text.Encoding.UTF8.GetBytes(serializedCalendar);
+
+        return icsData;
     }
 }
