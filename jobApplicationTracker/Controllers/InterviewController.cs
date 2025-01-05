@@ -21,17 +21,13 @@ public class InterviewController(IInterviewService interviewService, IMapper map
     public async Task<IActionResult> GetInterviewsByJobApplicationId(Guid jobApplicationId)
     {
         var returnModel = new ServiceResponse<IEnumerable<InterviewView>>();
-
         var interviewsResponse = await interviewService.GetInterviewsByJobApplicationIdAsync(jobApplicationId);
-        if (!interviewsResponse.Success)
-        {
-            return BadRequest(interviewsResponse.Message);
-        }
 
         var viewModel = mapper.Map<IEnumerable<InterviewView>>(interviewsResponse.Data);
-        returnModel.Data = viewModel;
+        returnModel.Data = viewModel;       //(IEnumerable<InterviewView>)viewModel;
         returnModel.Success = interviewsResponse.Success;
         returnModel.Message = interviewsResponse.Message;
+        returnModel.StatusCode = interviewsResponse.StatusCode;
 
         return Ok(returnModel);
     }
@@ -55,7 +51,7 @@ public class InterviewController(IInterviewService interviewService, IMapper map
             return BadRequest(ex.Message);
         }
 
-        return CreatedAtAction(nameof(GetInterviewsByJobApplicationId), new { jobApplicationId = interviewView.JobApplicationId }, returnModel);
+        return GenerateResponse(returnModel);
     }
 
     /// <summary>
@@ -77,7 +73,7 @@ public class InterviewController(IInterviewService interviewService, IMapper map
             return BadRequest(ex.Message);
         }
 
-        return Ok(returnModel);
+        return GenerateResponse(returnModel);
     }
 
     /// <summary>
@@ -91,7 +87,7 @@ public class InterviewController(IInterviewService interviewService, IMapper map
         try
         {
             var interviewResponse = await interviewService.DeleteInterviewAsync(id);
-            returnModel = mapper.Map<ServiceResponse<bool>>(interviewResponse);
+            returnModel = mapper.Map<ServiceResponse<bool>>(interviewResponse); //Not necessary?
         }
         catch (Exception ex)
         {
@@ -108,24 +104,34 @@ public class InterviewController(IInterviewService interviewService, IMapper map
     public async Task<IActionResult> ExportInterviewsToICS(Guid jobApplicationId)
     {
         var returnModel = new ServiceResponse<byte[]>();
-
         try
         {
-            var exportResponse = await interviewService.ExportInterviewsToICSAsync(jobApplicationId);
-            if (!exportResponse.Success)
+            returnModel = await interviewService.ExportInterviewsToICSAsync(jobApplicationId);
+
+            if (!returnModel.Success)
             {
-                return BadRequest(exportResponse.Message);
+                // Return an appropriate error response if the service fails
+                return StatusCode((int)returnModel.StatusCode, new
+                {
+                    returnModel.Message,
+                    returnModel.ErrorMessages
+                });
             }
 
-            byte[] returnFile = exportResponse.Data;
-            returnModel.Message = exportResponse.Message;
-            returnModel.StatusCode = exportResponse.StatusCode;
+            // Set headers for downloading the .ics file
+            Response.Headers.Add("Content-Disposition", "attachment; filename=interviews.ics");
+            Response.ContentType = "text/calendar";
 
-            return File(returnFile, "application/ics", "interviews.ics");
+            // Return the .ics file as a byte array
+            return File(returnModel.Data, "text/calendar");
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return StatusCode(StatusCodes.Status500InternalServerError, new
+            {
+                Message = "An unexpected error occurred while exporting interviews.",
+                Error = ex.Message
+            });
         }
     }
 }
