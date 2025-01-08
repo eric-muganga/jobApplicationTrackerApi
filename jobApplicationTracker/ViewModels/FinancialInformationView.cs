@@ -2,7 +2,7 @@
 {
     public class FinancialInformationView
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public string Salary { get; set; }
         public string Currency { get; set; }
         public string SalaryType { get; set; }
