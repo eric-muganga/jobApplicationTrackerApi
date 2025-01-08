@@ -244,6 +244,28 @@ namespace jobApplicationTrackerApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContractTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("48f7283f-5629-4039-a492-4613321810dd"),
+                            Name = "Full-Time"
+                        },
+                        new
+                        {
+                            Id = new Guid("3053a70e-9408-41ba-9732-1c6ffab93a2e"),
+                            Name = "Part-Time"
+                        },
+                        new
+                        {
+                            Id = new Guid("2d678970-09bb-47c1-9d1a-a3cd9cb307b1"),
+                            Name = "Freelance"
+                        },
+                        new
+                        {
+                            Id = new Guid("156ff3cc-fd57-4f3d-80d9-7607e8aca482"),
+                            Name = "Internship"
+                        });
                 });
 
             modelBuilder.Entity("jobApplicationTrackerApi.DataModels.FinancialInformation", b =>
@@ -400,12 +422,36 @@ namespace jobApplicationTrackerApi.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Statuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("17be4434-0cc8-48dc-ba2a-deadcc97f814"),
+                            Name = "Wishlist"
+                        },
+                        new
+                        {
+                            Id = new Guid("355bce13-f344-49f5-b198-b049751a6fc8"),
+                            Name = "Applied"
+                        },
+                        new
+                        {
+                            Id = new Guid("0c54c354-4958-480a-a757-3d6cd214bc7f"),
+                            Name = "Interviewing"
+                        },
+                        new
+                        {
+                            Id = new Guid("7979b18c-4eeb-4b29-9d33-89b996c431b1"),
+                            Name = "Offer"
+                        },
+                        new
+                        {
+                            Id = new Guid("0d05157a-0519-4034-9716-316fe203af3a"),
+                            Name = "Rejected"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
