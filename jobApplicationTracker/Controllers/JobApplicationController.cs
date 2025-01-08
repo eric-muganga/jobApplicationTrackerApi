@@ -16,7 +16,7 @@ namespace jobApplicationTrackerApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+//[Authorize]
 public class JobApplicationController(IJobApplicationService jobApplicationService, IMapper mapper) : JobAppControllerBase
 {
 
@@ -63,12 +63,29 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
         try
         {
             var jobApplication = mapper.Map<JobApplication>(jobApplicationView);
+            jobApplication.Id = Guid.NewGuid(); // generate ID if not provided
             jobApplication.UserId = Guid.Parse(userId);
 
             var jobAppCreatedDto = await jobApplicationService.AddJobApplicationAsync(jobApplication);
+            
+            // just in case It's not success, it returns an appropriate HTTP status code along with the service response.
+            if (!jobAppCreatedDto.Success)
+            {
+                return StatusCode((int)jobAppCreatedDto.StatusCode, jobAppCreatedDto);
+            }
+            
+            
+            // 5) The service now returns a fully loaded 'JobApplication' with Status navigation
+            // Map it back to the view model, which includes the Status string
+            var savedEntity = jobAppCreatedDto.Data;
+            var jobAppView = mapper.Map<JobApplicationView>(savedEntity);
+            
 
-            returnModel = mapper.Map<ServiceResponse<JobApplicationView>>(jobAppCreatedDto);
-
+            // 6) Build your ServiceResponse
+            returnModel.Data = jobAppView;
+            returnModel.Success = true;
+            returnModel.Message = "Job application added successfully.";
+            returnModel.StatusCode = HttpStatusCode.Created;
         }
         catch (Exception ex)
         {
@@ -127,18 +144,38 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     [HttpPatch("{id:guid}/status/{statusId:guid}")]
     public async Task<IActionResult> UpdateStatus(Guid id, Guid statusId)
     {
-        var returnModel = new ServiceResponse<JobApplicationView>();
-
         try
         {
-            var jobAppUpdateStatusDto = await jobApplicationService.UpdateJobApplicationStatusAsync(id, statusId, userId);
-            returnModel = mapper.Map<ServiceResponse<JobApplicationView>>(jobAppUpdateStatusDto);
+            Console.WriteLine($"Received JobApplicationId: {id}");
+            Console.WriteLine($"Received StatusId: {statusId}");
+            
+            var serviceResponse = await jobApplicationService.UpdateJobApplicationStatusAsync(id, statusId, userId);
+            
+            if (!serviceResponse.Success)
+            {
+                return StatusCode((int)serviceResponse.StatusCode, serviceResponse);
+            }
+
+            //Map the domain model (serviceResponse.Data) -> JobApplicationView
+            var updatedView = mapper.Map<JobApplicationView>(serviceResponse.Data);
+
+            //Wrap it in a new ServiceResponse<JobApplicationView> 
+            var returnModel = new ServiceResponse<JobApplicationView>
+            {
+                Data = updatedView,
+                Success = true,
+                Message = serviceResponse.Message,
+                ErrorMessages = serviceResponse.ErrorMessages,
+                StatusCode = serviceResponse.StatusCode
+            };
+
+            // Return 200 OK
+            return Ok(returnModel);
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok(returnModel);
     }
 
     /// <summary>
