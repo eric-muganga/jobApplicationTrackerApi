@@ -2,6 +2,7 @@ using System.Net;
 using Azure;
 using jobApplicationTrackerApi.Data;
 using jobApplicationTrackerApi.DataModels;
+using jobApplicationTrackerApi.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 
@@ -102,32 +103,58 @@ public class JobApplicationService : IJobApplicationService
     }
 
     /// <summary>
-    /// Add a new job application and saves it in the database.
-    /// Returns the newly created entity.
-    /// </summary>
-    public async Task<ServiceResponse<JobApplication>> AddJobApplicationAsync(JobApplication jobApplication)
+/// Add a new job application and saves it in the database.
+/// Returns the newly created view model.
+/// </summary>
+public async Task<ServiceResponse<JobApplication>> AddJobApplicationAsync(JobApplication jobApplication)
+{
+    var response = new ServiceResponse<JobApplication>();   
+    try
     {
-        var response = new ServiceResponse<JobApplication>();   
-        try
+        // Check if FinancialInformation is new (Id is empty)
+        if (jobApplication.FinancialInformation?.Id == Guid.Empty)
         {
-            _context.JobApplications.Add(jobApplication);
+            var newFinancialInfo = new FinancialInformation
+            {
+                Salary = jobApplication.FinancialInformation.Salary,
+                Currency = jobApplication.FinancialInformation.Currency,
+                SalaryType = jobApplication.FinancialInformation.SalaryType,
+                TypeOfEmployment = jobApplication.FinancialInformation.TypeOfEmployment
+            };
+
+            // Add the new FinancialInformation entity
+            _context.FinancialInformations.Add(newFinancialInfo);
             await _context.SaveChangesAsync();
-            
-            response.Data = jobApplication;
-            response.Message = "Job application added successfully.";
-            response.StatusCode = HttpStatusCode.Created;
+
+            // Assign the newly created FinancialInformationId to the JobApplication
+            jobApplication.FinancialInformationId = newFinancialInfo.Id;
         }
-        catch (Exception e)
-        {
-            response.Success = false;
-            response.Data = null;
-            response.Message = "An error occurred while adding the job application.";
-            response.ErrorMessages = new List<string> { e.Message };
-            response.StatusCode = HttpStatusCode.InternalServerError;
-        }
+
+        // Add the JobApplication entity
+        _context.JobApplications.Add(jobApplication);
+        await _context.SaveChangesAsync();
+
+        // Load the Status nav property so we can get the string Name
+        await _context.Entry(jobApplication).Reference(j => j.Status).LoadAsync();
         
-        return response;
+        // Populate success response
+        response.Data = jobApplication;
+        response.Message = "Job application added successfully.";
+        response.StatusCode = HttpStatusCode.Created;
+        response.Success = true;
     }
+    catch (Exception e)
+    {
+        // Populate error response
+        response.Success = false;
+        response.Data = null;
+        response.Message = "An error occurred while adding the job application.";
+        response.ErrorMessages = new List<string> { e.Message };
+        response.StatusCode = HttpStatusCode.InternalServerError;
+    }
+    
+    return response;
+}
 
     /// <summary>
     /// Updates an existing job application.
@@ -155,6 +182,11 @@ public class JobApplicationService : IJobApplicationService
             // Update properties as needed.
             _context.Entry(existing).CurrentValues.SetValues(jobApplication);
             await _context.SaveChangesAsync();  
+            
+            // Load Status or financial info if needed
+            await _context.Entry(existing).Reference(j => j.Status).LoadAsync();
+            await _context.Entry(existing)
+                .Reference(j => j.FinancialInformation).LoadAsync();
         
             response.Data = existing;
             response.Message = "Job application updated successfully.";
@@ -249,6 +281,9 @@ public class JobApplicationService : IJobApplicationService
             
             existing.StatusId = statusId;
             await _context.SaveChangesAsync();
+            
+            // **Load** the nav property so we can map Status.Name
+            await _context.Entry(existing).Reference(j => j.Status).LoadAsync();
             
             response.Data = existing;
             response.Message = "Job application status updated successfully.";
