@@ -11,7 +11,10 @@ public class MappingProfile : Profile
     {
         // Mapping from DataModels -> ViewModels
 
-        CreateMap<JobApplication, JobApplicationView>().ReverseMap();
+        CreateMap<JobApplication, JobApplicationView>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.Name))
+            .ReverseMap()
+            .ForMember(dest => dest.Status, opt => opt.Ignore());
 
         CreateMap<JobApplicationHistory, JobApplicationHistoryView>()
             .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.StatusId.ToString()));

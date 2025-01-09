@@ -67,8 +67,17 @@ public class JobAppTrackerDbContext : IdentityDbContext<ApplicationUser>
                 .IsRequired()
                 .HasMaxLength(50);
 
-            entity.Property(e => e.SortOrder)
-                .IsRequired();
+            //entity.Property(e => e.SortOrder)
+                //.IsRequired();
+                
+            // Seed data 
+            entity.HasData(
+                new Status { Id = Guid.NewGuid(), Name = "Wishlist" },
+                new Status { Id = Guid.NewGuid(), Name = "Applied" },
+                new Status { Id = Guid.NewGuid(), Name = "Interviewing" },
+                new Status { Id = Guid.NewGuid(), Name = "Offer" },
+                new Status { Id = Guid.NewGuid(), Name = "Rejected" }
+            );
 
         });
         
@@ -119,6 +128,14 @@ public class JobAppTrackerDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(50);
+            
+            // Seed data 
+            entity.HasData(
+                new ContractType { Id = Guid.NewGuid(), Name = "Full-Time" },
+                new ContractType { Id = Guid.NewGuid(), Name = "Part-Time" },
+                new ContractType { Id = Guid.NewGuid(), Name = "Freelance" },
+                new ContractType { Id = Guid.NewGuid(), Name = "Internship" }
+            );
         });
         
         

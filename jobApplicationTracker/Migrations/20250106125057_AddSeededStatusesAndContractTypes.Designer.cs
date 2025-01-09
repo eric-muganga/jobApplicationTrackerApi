@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using jobApplicationTrackerApi.Data;
 
@@ -11,9 +12,11 @@ using jobApplicationTrackerApi.Data;
 namespace jobApplicationTrackerApi.Migrations
 {
     [DbContext(typeof(JobAppTrackerDbContext))]
-    partial class JobAppTrackerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250106125057_AddSeededStatusesAndContractTypes")]
+    partial class AddSeededStatusesAndContractTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,23 +251,28 @@ namespace jobApplicationTrackerApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("48f7283f-5629-4039-a492-4613321810dd"),
-                            Name = "Full-Time"
+                            Id = new Guid("a6faf712-a40a-4c49-bc7c-2d069ac1f136"),
+                            Name = "Full-Time (Employment Contract)"
                         },
                         new
                         {
-                            Id = new Guid("3053a70e-9408-41ba-9732-1c6ffab93a2e"),
+                            Id = new Guid("4c5111e5-2d5b-4dda-b9e9-ff315f8e30e9"),
                             Name = "Part-Time"
                         },
                         new
                         {
-                            Id = new Guid("2d678970-09bb-47c1-9d1a-a3cd9cb307b1"),
+                            Id = new Guid("bf7f575e-8917-4a63-8eb9-cced30249d4c"),
                             Name = "Freelance"
                         },
                         new
                         {
-                            Id = new Guid("156ff3cc-fd57-4f3d-80d9-7607e8aca482"),
+                            Id = new Guid("d707a21a-5c36-4bdc-b78c-420705fa948e"),
                             Name = "Internship"
+                        },
+                        new
+                        {
+                            Id = new Guid("c9456204-9005-411c-af7a-f7bbee972229"),
+                            Name = "Commission Contract"
                         });
                 });
 
@@ -429,27 +437,27 @@ namespace jobApplicationTrackerApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("17be4434-0cc8-48dc-ba2a-deadcc97f814"),
+                            Id = new Guid("1e6765d7-b23a-41a6-a488-58dd73ad553b"),
                             Name = "Wishlist"
                         },
                         new
                         {
-                            Id = new Guid("355bce13-f344-49f5-b198-b049751a6fc8"),
+                            Id = new Guid("4bd007bc-1632-40ed-a990-2e670ab5ddc1"),
                             Name = "Applied"
                         },
                         new
                         {
-                            Id = new Guid("0c54c354-4958-480a-a757-3d6cd214bc7f"),
+                            Id = new Guid("6f857884-154b-44df-aff4-355c2fe93c54"),
                             Name = "Interviewing"
                         },
                         new
                         {
-                            Id = new Guid("7979b18c-4eeb-4b29-9d33-89b996c431b1"),
+                            Id = new Guid("c0634a52-de6a-4c70-b701-dc7e96902314"),
                             Name = "Offer"
                         },
                         new
                         {
-                            Id = new Guid("0d05157a-0519-4034-9716-316fe203af3a"),
+                            Id = new Guid("efa5e3c7-e26d-45c0-a79d-8fc32cddfe86"),
                             Name = "Rejected"
                         });
                 });
