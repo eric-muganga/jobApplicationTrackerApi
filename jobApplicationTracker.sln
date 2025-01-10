@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35431.28
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jobApplicationTrackerApi", "jobApplicationTracker\jobApplicationTrackerApi.csproj", "{9C124225-EB94-4100-9089-535B0D32CBA5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobApplicationTracker.Tests", "JobApplicationTracker.Tests\JobApplicationTracker.Tests.csproj", "{F6363EC1-56D6-42D6-81B4-9C2EAB60561D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{9C124225-EB94-4100-9089-535B0D32CBA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C124225-EB94-4100-9089-535B0D32CBA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C124225-EB94-4100-9089-535B0D32CBA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6363EC1-56D6-42D6-81B4-9C2EAB60561D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6363EC1-56D6-42D6-81B4-9C2EAB60561D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6363EC1-56D6-42D6-81B4-9C2EAB60561D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6363EC1-56D6-42D6-81B4-9C2EAB60561D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
