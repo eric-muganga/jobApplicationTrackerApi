@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using Azure;
 using jobApplicationTrackerApi.Data;
@@ -58,7 +59,115 @@ public class JobApplicationService : IJobApplicationService
 
     }
 
-    
+
+    /// <summary>
+    /// Retrieves job applications for a current and two months before.
+    /// </summary>
+    public async Task<ServiceResponse<Dictionary<string, int>>> GetJobApplicationsPerMonthsAsync(string userId)
+    {
+        var currentDate = DateTime.UtcNow;
+
+        var response = new ServiceResponse<Dictionary<string,int>>();
+
+
+        var months = new[]
+        {
+        new { Month = currentDate.Month, Year = currentDate.Year },
+        new { Month = currentDate.AddMonths(-1).Month, Year = currentDate.AddMonths(-1).Year },
+        new { Month = currentDate.AddMonths(-2).Month, Year = currentDate.AddMonths(-2).Year }
+    };
+
+        var result = new Dictionary<string, int>();
+
+        try
+        {
+            foreach (var monthInfo in months)
+            {
+                var count = await _context.JobApplications
+                    .Where(job => job.UserId == Guid.Parse(userId) &&
+                                  job.CreatedAt.Month == monthInfo.Month &&
+                                  job.CreatedAt.Year == monthInfo.Year)
+                    .CountAsync();
+
+
+                result[CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(monthInfo.Month)] = count;
+            }
+
+
+            response.Data = result;
+            response.Message = "Job applications retrieved successfully";
+            response.StatusCode = HttpStatusCode.OK;
+        }
+        catch (Exception ex)
+        {
+            response.Success = false;
+            response.Data = null;
+            response.Message = "An error occurred while retrieving job applications by month.";
+            response.ErrorMessages = new List<string> { ex.Message };
+            response.StatusCode = HttpStatusCode.InternalServerError;
+        }
+
+        return response;
+    }
+
+
+    /// <summary>
+    /// Retrieves job applications for a current and two months before.
+    /// </summary>
+    public async Task<ServiceResponse<Dictionary<Guid, int>>> GetJobApplicationsByStatusesAsync(string userId)
+    {
+        var response = new ServiceResponse<Dictionary<Guid, int>>();
+
+        try
+        {
+            var statuses = await _context.Statuses.ToListAsync();
+
+            if (statuses == null || !statuses.Any())
+            {
+                response.Success = false;
+                response.Message = "No statuses found.";
+                response.Data = null;
+                return response;
+            }
+
+            var statusCounts = statuses.ToDictionary(status => status.Id, status => 0);
+
+            var jobApplications = await _context.JobApplications
+                .Where(job => job.UserId == Guid.Parse(userId))
+                .ToListAsync();
+
+            if (jobApplications == null || !jobApplications.Any())
+            {
+                response.Success = true;
+                response.Message = "No job applications found for the specified user.";
+                response.Data = statusCounts;
+                return response;
+            }
+
+            foreach (var jobApp in jobApplications)
+            {
+                if (statusCounts.ContainsKey(jobApp.StatusId))
+                {
+                    statusCounts[jobApp.StatusId]++;
+                }
+            }
+
+            response.Success = true;
+            response.Message = "Job application counts by status retrieved successfully.";
+            response.Data = statusCounts;
+            return response;
+        }
+        catch (Exception ex)
+        {
+            response.Success = false;
+            response.Message = $"An error occurred: {ex.Message}";
+            response.Data = null;
+            return response;
+        }
+    }
+
+
+
     /// <summary>
     /// Retrieves a single job application by GUID. 
     /// If not found, returns a response indicating failure.

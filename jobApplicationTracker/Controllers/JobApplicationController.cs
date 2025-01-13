@@ -40,6 +40,39 @@ public class JobApplicationController(IJobApplicationService jobApplicationServi
     }
 
     /// <summary>
+    /// Retrieves a number of job applications for the past three months.
+    /// </summary>
+    [HttpGet("statistics-per-months")]
+    public async Task<IActionResult> GetJobApplicationsForThreeMonths()
+    {
+        var result = await jobApplicationService.GetJobApplicationsPerMonthsAsync(userId);
+        //maybe call both functions from one method and then wait until both methods return some result using (await)
+
+        if (result == null || !result.Data.Any())
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
+    }
+
+
+    /// <summary>
+    /// Retrieves a number of job applications with different statuses.
+    /// </summary>
+    [HttpGet("statistics-by-statuses")]
+    public async Task<IActionResult> GetJobApplicationsByStatuses()
+    {
+        var result = await jobApplicationService.GetJobApplicationsByStatusesAsync(userId);
+
+        if (result == null || !result.Data.Any())
+        {
+            return BadRequest(result);
+        }
+        return Ok(result);
+    }
+    //number of jobs by statuses for the whole time
+
+    /// <summary>
     /// Retrieves a specific job application by its unique identifier.
     /// </summary>
     [HttpGet("{id:guid}")]
