@@ -12,6 +12,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
+using jobApplicationTrackerApi.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace jobApplicationTrackerApi.Controllers;
 
@@ -20,50 +22,71 @@ namespace jobApplicationTrackerApi.Controllers;
 [ApiController]
 public class UserController(
     UserManager<ApplicationUser> userManager,
-    SignInManager<ApplicationUser> signInManager
+    SignInManager<ApplicationUser> signInManager,
+    IConfiguration configuration
     ) : JobAppControllerBase
 {
+    //[AllowAnonymous]
     [HttpPost("create")]
-    public async Task<IActionResult> CreateUser(
-        string email,
-        string password,
-        string firstName,
-        string fullName)
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto model)
     {
         var nUser = new ApplicationUser()
         {
-            UserName = email,
-            Email = email,
-            FirstName = firstName,
-            FullName = fullName
+            UserName = model.Email,
+            Email = model.Email,
+            FirstName = model.FirstName,
+            FullName = model.FullName
         };
-        var result = await userManager.CreateAsync(nUser, password);
+        var result = await userManager.CreateAsync(nUser, model.Password);
         if (result.Succeeded)
         {
             return Ok(nUser);
         }
+        
+        // Log the errors for debugging
+        foreach (var error in result.Errors)
+        {
+            Console.WriteLine($"Code: {error.Code}, Description: {error.Description}");
+        }
         return BadRequest(result);
     }
 
+    //[AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginViewModel login)
     {
-        var user = await SignInAsync(login.Email, login.Password);
-        if (user != null)
+        try
         {
-            var model = new UserMainInfoViewModel()
+            var user = await SignInAsync(login.Email, login.Password);
+            if (user != null)
             {
-                Id = new Guid(user.Id),
-                Email = login.Email,
-                RoleId = RoleType.NoRole
-            };
+                var model = new UserMainInfoViewModel()
+                {
+                    Id = new Guid(user.Id),
+                    Email = login.Email,
+                    RoleId = RoleType.NoRole
+                };
 
-            var encodedJwt = GetJwtToken(model);
-            var response = new { token = encodedJwt };
+                var encodedJwt = GetJwtToken(model);
+                return Ok(new { token = encodedJwt, user = user });
+            }
 
-            return Ok(response);
+            return Unauthorized("Invalid login credentials");
         }
-        return Unauthorized();
+        catch (Exception ex)
+        {
+            if (ex.Message == "Incorrect password")
+            {
+                return Unauthorized("Incorrect password. Please try again.");
+            }
+
+            if (ex.Message.Contains("was not found"))
+            {
+                return NotFound(ex.Message); // If the email was not found
+            }
+
+            return BadRequest("An error occurred during login. Please try again.");
+        }
     }
 
 
@@ -172,15 +195,17 @@ public class UserController(
                 return user;
             }
 
-            throw new Exception("Can't login");
+            // If the password is incorrect
+            throw new Exception("Incorrect password");
         }
         throw new Exception($"User with email={email} was not found");
     }
 
-    private static string GetJwtToken(UserMainInfoViewModel userMainInfo)
+    private string GetJwtToken(UserMainInfoViewModel userMainInfo)
     {
+        var jwtSettings = configuration.GetSection("Jwt"); // Use IConfiguration to load settings
         var now = DateTime.UtcNow;
-        var lifetime = TimeSpan.FromMinutes(45);
+        var lifetime = TimeSpan.FromMinutes(int.Parse(jwtSettings["TokenExpiryMinutes"])); // Dynamically set token lifetime
 
         var claims = new Collection<Claim>
         {
@@ -196,9 +221,15 @@ public class UserController(
         };
 
         //TODO update secret key
-        var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("a6e0cbea095e2e237f2fdd3586f6ddd557ac9d45db2672c8bbdb266d891c4958"));
-        var jwt = new JwtSecurityToken("JobAppTrackerIssuer", "JobAppTrackerIssuer", claims,
-            now, now.Add(lifetime), new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256));
+        var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]));
+        var jwt = new JwtSecurityToken(
+            issuer: jwtSettings["Issuer"],
+            audience: jwtSettings["Audience"],
+            claims: claims,
+            notBefore: now,
+            expires: now.Add(lifetime),
+            signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+        );
 
         var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
