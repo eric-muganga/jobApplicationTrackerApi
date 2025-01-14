@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Identity;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize]
+[Authorize]
 
 public class JobApplicationHistoryController(IJobApplicationHistoryService historyService, IMapper mapper) : JobAppControllerBase
 {
