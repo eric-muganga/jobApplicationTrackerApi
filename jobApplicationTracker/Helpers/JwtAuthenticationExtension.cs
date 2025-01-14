@@ -7,8 +7,11 @@ using System.Text;
 
 public static class JwtAuthenticationExtension
 {
-    public static AuthenticationBuilder AddJwtAuthentication(this AuthenticationBuilder authenticationBuilder)
+    public static AuthenticationBuilder AddJwtAuthentication(this AuthenticationBuilder authenticationBuilder, IConfiguration configuration)
     {
+        var jwtSettings = configuration.GetSection("Jwt");
+        var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]));
+        
         authenticationBuilder
             .AddJwtBearer(options =>
             {
@@ -22,9 +25,9 @@ public static class JwtAuthenticationExtension
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = signingKey,
                     ValidateIssuer = true,
-                    ValidIssuer = "JobAppTrackerIssuer",
+                    ValidIssuer = jwtSettings["Issuer"],
                     ValidateAudience = true,
-                    ValidAudience = "JobAppTrackerIssuer",
+                    ValidAudience = jwtSettings["Audience"],
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
