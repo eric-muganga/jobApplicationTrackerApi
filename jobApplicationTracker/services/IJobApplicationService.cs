@@ -9,7 +9,17 @@ public interface IJobApplicationService
     /// Retrieves a list of all job applications.
     /// </summary>
     Task<ServiceResponse<IEnumerable<JobApplication>>> GetJobApplicationsAsync(string userId);
-    
+
+    /// <summary>
+    /// Retrieves number of job applications for current month and two months before it.
+    /// </summary>
+    Task<ServiceResponse<Dictionary<string, int>>> GetJobApplicationsPerMonthsAsync(string userId);
+
+    /// <summary>
+    /// Retrieves a dictionary with statuse and number of job applications with a certain status.
+    /// </summary>
+    Task<ServiceResponse<Dictionary<Guid, int>>> GetJobApplicationsByStatusesAsync(string userId);
+
     /// <summary>
     /// Retrieves a specific job application by its unique identifier.
     /// </summary>
