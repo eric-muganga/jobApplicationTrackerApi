@@ -34,7 +34,7 @@ builder.Services.AddScoped<IInterviewService, InterviewService>();
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 builder.Services.AddScoped<IJobApplicationHistoryService, JobApplicationHistoryService>();
 
-
+// Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.CustomOperationIds(e => $"{e.ActionDescriptor.RouteValues["controller"]}_{e.HttpMethod}");
@@ -60,13 +60,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtAuthentication();
+}).AddJwtAuthentication(builder.Configuration);
 
+
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
