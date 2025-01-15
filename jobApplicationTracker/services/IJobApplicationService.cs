@@ -1,5 +1,6 @@
 
 using jobApplicationTrackerApi.DataModels;
+using jobApplicationTrackerApi.Helpers;
 
 namespace jobApplicationTrackerApi.Services;
 
@@ -18,7 +19,7 @@ public interface IJobApplicationService
     /// <summary>
     /// Retrieves a dictionary with statuse and number of job applications with a certain status.
     /// </summary>
-    Task<ServiceResponse<Dictionary<Guid, int>>> GetJobApplicationsByStatusesAsync(string userId);
+    Task<ServiceResponse<List<StatusWithCount>>> GetJobApplicationsByStatusesAsync(string userId);
 
     /// <summary>
     /// Retrieves a specific job application by its unique identifier.
