@@ -3,6 +3,7 @@ using System.Net;
 using Azure;
 using jobApplicationTrackerApi.Data;
 using jobApplicationTrackerApi.DataModels;
+using jobApplicationTrackerApi.Helpers;
 using jobApplicationTrackerApi.ViewModels;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -114,13 +115,15 @@ public class JobApplicationService : IJobApplicationService
     /// <summary>
     /// Retrieves job applications for a current and two months before.
     /// </summary>
-    public async Task<ServiceResponse<Dictionary<Guid, int>>> GetJobApplicationsByStatusesAsync(string userId)
+    public async Task<ServiceResponse<List<StatusWithCount>>> GetJobApplicationsByStatusesAsync(string userId)
     {
-        var response = new ServiceResponse<Dictionary<Guid, int>>();
+        var response = new ServiceResponse<List<StatusWithCount>>();
 
         try
         {
-            var statuses = await _context.Statuses.ToListAsync();
+            var statuses = await _context.Statuses
+                .Select(status => new {status.Id, status.Name})
+                .ToListAsync();
 
             if (statuses == null || !statuses.Any())
             {
@@ -130,7 +133,15 @@ public class JobApplicationService : IJobApplicationService
                 return response;
             }
 
-            var statusCounts = statuses.ToDictionary(status => status.Id, status => 0);
+            // Initialize status counts with zero for all statuses
+            var statusCounts = statuses
+                .Select(status => new StatusWithCount()
+                {
+                    StatusId = status.Id,
+                    StatusName = status.Name,
+                    Total = 0
+                })
+                .ToList();
 
             var jobApplications = await _context.JobApplications
                 .Where(job => job.UserId == Guid.Parse(userId))
@@ -144,14 +155,16 @@ public class JobApplicationService : IJobApplicationService
                 return response;
             }
 
+            // Count job applications by status
             foreach (var jobApp in jobApplications)
             {
-                if (statusCounts.ContainsKey(jobApp.StatusId))
+                var statusCount = statusCounts.FirstOrDefault(s => s.StatusId == jobApp.StatusId);
+                if (statusCount != null)
                 {
-                    statusCounts[jobApp.StatusId]++;
+                    statusCount.Total++;
                 }
             }
-
+            
             response.Success = true;
             response.Message = "Job application counts by status retrieved successfully.";
             response.Data = statusCounts;
